@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.web.mappers.board.boardMapper">
+
+  
+<!-- 게시글목록 셀렉트 출력 -->
+<select  id="getBoardList" resultType="kr.co.web.model.board.BoardDto">
+	select * from atworks_qna
+	<trim prefix="WHERE" prefixOverrides="AND|OR">
+		<if
+			test="searchType=='title' and keyword != null and keyword != '' ">
+			AND TITLE like CONCAT('%', #{keyword}, '%')
+		</if>
+		<if
+			test="searchType=='contents' and keyword != null and keyword != '' ">
+			AND contents like CONCAT('%', #{keyword}, '%')
+		</if>
+		<if
+			test="searchType=='u_id' and keyword != null and keyword != '' ">
+			AND u_id like CONCAT('%', #{keyword}, '%')
+		</if>
+	</trim>
+	ORDER BY seq desc
+	LIMIT #{startList}, #{listSize}
+</select>
+
+<select id="getBoardListCnt" resultType="int">
+	SELECT count(*) as listCnt 
+	FROM atworks_qna
+	<trim prefix="WHERE" prefixOverrides="AND|OR">
+		<if
+			test="searchType=='title' and keyword != null and keyword != '' ">
+			AND TITLE like CONCAT('%', #{keyword}, '%')
+		</if>
+		<if
+			test="searchType=='content' and keyword != null and keyword != '' ">
+			AND CONTENTs like CONCAT('%', #{keyword}, '%')
+		</if>
+		<if
+			test="searchType=='reg_id' and keyword != null and keyword != '' ">
+			AND u_id like CONCAT('%', #{keyword}, '%')
+		</if>
+	</trim>
+</select> 
+
+<!-- 조회수 증가 -->
+<update id="viewCnt" parameterType="kr.co.web.model.board.BoardDto">
+	update atworks_qna set view_count = view_count + 1 where seq = #{seq}
+</update>
+ 
+ 
+<!-- 글 보기 -->
+<select id="qnaDetail" resultType="kr.co.web.model.board.BoardDto" parameterType="kr.co.web.model.board.BoardDto">
+	select * from atworks_qna 
+	where seq = #{seq}
+</select> 
+ 
+
+<!-- 글 작성 -->
+<insert id="insertBoard" parameterType="kr.co.web.model.board.BoardDto">
+	insert into atworks_qna(category, u_id, title, contents)
+	values(#{category} , #{u_id}, #{title}, #{contents})
+</insert> 
+
+<!-- 글 수정 -->
+<update id="updateQna" parameterType="kr.co.web.model.board.BoardDto">
+	update atworks_qna set title = #{title}, contents = #{contents}, category = #{category}
+	where u_id = #{u_id}
+</update>
+
+<delete id="deleteQna" parameterType="kr.co.web.model.board.BoardDto">
+	delete from atworks_qna where seq = #{seq}
+</delete>
+
+
+
+</mapper>
